@@ -4,6 +4,16 @@
 #define ALPHABET_SIZE 26
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
 
+/* useful macro for handling error codes */
+#define DIE(assertion, call_description)                       \
+	do {                                                       \
+		if (assertion) {                                       \
+			fprintf(stderr, "(%s, %d): ", __FILE__, __LINE__); \
+			perror(call_description);                          \
+			exit(errno);                                       \
+		}                                                      \
+	} while (0)
+
 typedef struct trie_node_t trie_node_t;
 struct trie_node_t {
 	/* Value associated with key (set if end_of_word = 1) */
@@ -38,8 +48,6 @@ trie_node_t *trie_create_node(trie_t *trie);
 trie_t *trie_create(int data_size, int alphabet_size, char *alphabet);
 void trie_insert(trie_t *trie, char *key);
 trie_node_t *trie_search(trie_t *trie, char *key);
-// int aux_trie_remove(trie_t *trie, trie_node_t *node, char *key);
-
 void aux_trie_remove(trie_t *trie, char *key);
 void trie_remove(trie_t *trie, char *key);
 trie_node_t *trie_free(trie_node_t *node);

@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_LINE 100
+#include "commands_mk.h"
+#include "trie.h"
 
 int command_type_to_number(char *command)
 {
@@ -21,12 +22,15 @@ int command_type_to_number(char *command)
 		return 5;
 	if (strcmp(command, "EXIT") == 0)
 		return 6;
+
+	return -1;
 }
 
 int main(void)
 {
 	char line[MAX_LINE];
 	char delim[] = "\n ";
+	trie_t *trie = trie_create(sizeof(int), ALPHABET_SIZE, ALPHABET);
 
 	while (1) {
 		fgets(line, MAX_LINE, stdin);
@@ -35,16 +39,21 @@ int main(void)
 
 		switch (command_type) {
 		case 1:	 // INSERT
+			insert_command(trie, delim);
 			break;
 		case 2:	 // LOAD
+			load_command(trie, delim);
 			break;
 		case 3:	 // REMOVE
+			remove_command(trie, delim);
 			break;
 		case 4:	 // AUTOCORRECT
 			break;
 		case 5:	 // AUTOCOMPLETE
+			autocomplete_command(trie, delim);
 			break;
 		case 6:	 // EXIT
+
 			exit(0);
 		}
 	}
