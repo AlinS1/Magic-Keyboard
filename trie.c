@@ -39,7 +39,7 @@ void trie_insert(trie_t *trie, char *key)
 	if (!trie)
 		return;
 
-	// Daca exista deja, incrementam nr de aparitii
+	// If the word already exists, we just increment its number of appearances
 	trie_node_t *node = trie_search(trie, key);
 	if (node) {
 		node->appearances++;
@@ -65,12 +65,11 @@ void trie_insert(trie_t *trie, char *key)
 
 		current_node = current_node->children[idx];
 	}
-	// Pentru ultimul nod
+	// For the last node
 	current_node->end_of_word = 1;
 	current_node->appearances = 1;
 }
 
-// Verifies if there is a path with the letters given in key.
 trie_node_t *trie_search_path(trie_t *trie, char *key)
 {
 	if (!trie)
@@ -90,7 +89,6 @@ trie_node_t *trie_search_path(trie_t *trie, char *key)
 	return current_node;
 }
 
-// Verifies if there is a complete word with the letters given in key.
 trie_node_t *trie_search(trie_t *trie, char *key)
 {
 	if (!trie)
@@ -106,7 +104,8 @@ trie_node_t *trie_search(trie_t *trie, char *key)
 			return NULL;
 		current_node = current_node->children[idx];
 	}
-	// pt ultimul
+
+	// For the last
 	if (current_node->end_of_word == 1)
 		return current_node;
 	else
@@ -115,8 +114,10 @@ trie_node_t *trie_search(trie_t *trie, char *key)
 
 void aux_trie_remove(trie_t *trie, char *key, int *found_other_word)
 {
-	if (*found_other_word == 1)
+	if (*found_other_word == 1)	 // Stop if we found another word
 		return;
+
+	// Go to the node that corresponds to the last char in "key".
 	int len = strlen(key);
 	trie_node_t *current_node = trie->root;
 	trie_node_t *prev_node;
@@ -131,12 +132,17 @@ void aux_trie_remove(trie_t *trie, char *key, int *found_other_word)
 			free(current_node->children);
 			current_node->children = NULL;
 		}
-		return;
+		return;	 // Stop if we reached the root
 	}
+
+	// We have reached a character that is contained in another word, so we have
+	// to stop.
 	if (current_node->end_of_word == 1 || current_node->n_children != 0) {
 		*found_other_word = 1;
 		return;
 	}
+
+	// Free the memory only if the node doesn't have other children
 	if (current_node->n_children == 0) {
 		char *new_word = malloc(sizeof(char) * len);
 		DIE(!new_word, "malloc failed");
@@ -152,6 +158,7 @@ void aux_trie_remove(trie_t *trie, char *key, int *found_other_word)
 		free(current_node);
 		current_node = NULL;
 
+		// Eliminate the connection from the node's parent towards the node
 		int idx = key[len - 1] - 'a';
 		prev_node->children[idx] = NULL;
 
@@ -167,7 +174,7 @@ void trie_remove(trie_t *trie, char *key)
 
 	int len = strlen(key);
 
-	// Verificam daca avem acel cuvant
+	// Verify if the word we want to remove exists.
 	trie_node_t *node = trie_search(trie, key);
 	if (!node)
 		return;
@@ -175,6 +182,7 @@ void trie_remove(trie_t *trie, char *key)
 	node->end_of_word = 0;
 	node->appearances = 0;
 
+	// Decrement the number of children that the word's nodes will have.
 	node = trie->root;
 	for (int i = 0; i < len; i++) {
 		node->n_children--;
@@ -183,8 +191,6 @@ void trie_remove(trie_t *trie, char *key)
 	}
 
 	if (node->n_children == 0) {
-		// Trebuie sa eliminam si nodurile din spate pana cand gasim un alt
-		// cuvant.
 		int found_other_word = 0;
 		aux_trie_remove(trie, key, &found_other_word);
 		trie->nr_nodes--;
@@ -215,13 +221,4 @@ trie_node_t *trie_free(trie_node_t *node)
 	free(node);
 	node = NULL;
 	return NULL;
-}
-
-/* Needed for Lambda tests, ignore :) */
-void cleanup_example_string(char *str)
-{
-	int len = strlen(str);
-
-	if (str[len - 2] == '\\')
-		str[len - 2] = '\0';
 }

@@ -3,7 +3,7 @@ CC=gcc
 CFLAGS=-Wall -Wextra -Wshadow -Wpedantic -std=c99 -O0 -g
 
 # define targets
-TARGETS=kNN mk commands_mk trie
+TARGETS=kNN mk
 TRIE=trie
 COMMANDS_MK=commands_mk
 MK=mk
@@ -21,10 +21,10 @@ mk: mk.o $(TRIE).o $(COMMANDS_MK).o
 mk.o: mk.c
 	$(CC) $(CFLAGS) $^ -c
 
-$(TRIE).o: $(TRIE).c $(TRIE).h
+trie.o: $(TRIE).c $(TRIE).h
 	$(CC) $(CFLAGS) $^ -c
 
-$(COMMANDS_MK).o: $(COMMANDS_MK).c $(COMMANDS_MK).h
+commands_mk.o: $(COMMANDS_MK).c $(COMMANDS_MK).h
 	$(CC) $(CFLAGS) $^ -c
 
 

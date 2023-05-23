@@ -46,11 +46,19 @@ struct trie_t {
 trie_node_t *trie_create_node(trie_t *trie);
 trie_t *trie_create(int data_size, int alphabet_size, char *alphabet);
 void trie_insert(trie_t *trie, char *key);
+
+// Verifies if there is a path with the letters given in key.
 trie_node_t *trie_search_path(trie_t *trie, char *key);
+
+// Verifies if there is a complete word with the letters given in key.
 trie_node_t *trie_search(trie_t *trie, char *key);
+
+// Recursively removes the nodes of a word from the last letter until the first,
+// or until we find a char that belongs to other words.
 void aux_trie_remove(trie_t *trie, char *key, int *found_other_word);
 void trie_remove(trie_t *trie, char *key);
+
+// Recursively frees the nodes from the trie.
 trie_node_t *trie_free(trie_node_t *node);
-void cleanup_example_string(char *str);
 
 #endif	// TRIE_H
