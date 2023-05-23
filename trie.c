@@ -112,8 +112,10 @@ trie_node_t *trie_search(trie_t *trie, char *key)
 		return NULL;
 }
 
-void aux_trie_remove(trie_t *trie, char *key)
+void aux_trie_remove(trie_t *trie, char *key, int *found_other_word)
 {
+	if (*found_other_word == 1)
+		return;
 	int len = strlen(key);
 	trie_node_t *current_node = trie->root;
 	trie_node_t *prev_node;
@@ -130,8 +132,10 @@ void aux_trie_remove(trie_t *trie, char *key)
 		}
 		return;
 	}
-	if (current_node->end_of_word == 1)
+	if (current_node->end_of_word == 1 || current_node->n_children != 0) {
+		*found_other_word = 1;
 		return;
+	}
 	if (current_node->n_children == 0) {
 		// printf("rm:%c\n", key[len - 1]);
 		char *new_word = malloc(sizeof(char) * len);
@@ -150,7 +154,7 @@ void aux_trie_remove(trie_t *trie, char *key)
 		// printf("idx:%d car:%c\n", idx, key[len - 1]);
 		prev_node->children[idx] = NULL;
 
-		aux_trie_remove(trie, new_word);
+		aux_trie_remove(trie, new_word, found_other_word);
 		free(new_word);
 	}
 }
@@ -168,6 +172,8 @@ void trie_remove(trie_t *trie, char *key)
 		// printf("No such word\n");
 		return;
 	}
+	node->end_of_word = 0;
+	node->appearances = 0;
 
 	node = trie->root;
 	for (int i = 0; i < len; i++) {
@@ -176,23 +182,11 @@ void trie_remove(trie_t *trie, char *key)
 		node = node->children[idx];
 	}
 
-	node->end_of_word = 0;
-	node->appearances = 0;
 	if (node->n_children == 0) {
-		char *new_word = malloc(sizeof(char) * len);
-		for (int i = 0; i < len - 1; i++)
-			new_word[i] = key[i];
-		new_word[len - 1] = '\0';
-
 		// Trebuie sa eliminam si nodurile din spate pana cand gasim un alt
 		// cuvant.
-		aux_trie_remove(trie, new_word);
-		free(new_word);
-
-		free(node->children);
-		node->children = NULL;
-		free(node);
-		node = NULL;
+		int found_other_word = 0;
+		aux_trie_remove(trie, key, &found_other_word);
 		trie->nNodes--;
 	}
 }

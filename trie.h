@@ -49,7 +49,7 @@ trie_t *trie_create(int data_size, int alphabet_size, char *alphabet);
 void trie_insert(trie_t *trie, char *key);
 trie_node_t *trie_search_path(trie_t *trie, char *key);
 trie_node_t *trie_search(trie_t *trie, char *key);
-void aux_trie_remove(trie_t *trie, char *key);
+void aux_trie_remove(trie_t *trie, char *key, int *found_other_word);
 void trie_remove(trie_t *trie, char *key);
 trie_node_t *trie_free(trie_node_t *node);
 void cleanup_example_string(char *str);
