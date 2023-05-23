@@ -3,14 +3,14 @@ CC=gcc
 CFLAGS=-Wall -Wextra -Wshadow -Wpedantic -std=c99 -O0 -g
 
 # define targets
-TARGETS=kNN mk
+TARGETS=kNN mk commands_mk trie
 TRIE=trie
 COMMANDS_MK=commands_mk
 MK=mk
 KNN=kNN
 
 #define object-files
-OBJ=mk.o kNN.o
+OBJ=mk.o kNN.o commands_mk.o trie.o
 
 build: $(TARGETS)
 
@@ -38,7 +38,7 @@ kNN.o: kNN.c
 
 
 pack:
-	zip -FSr 311CA_MarcelPetrescu_Tema3.zip README.md Makefile *.c *.h
+	zip -FSr 314CA_SimileaAlin-Andrei_Tema3.zip README.md Makefile *.c *.h
 
 clean:
 	rm -f $(TARGETS) $(OBJ)

@@ -5,27 +5,6 @@
 #include "commands_mk.h"
 #include "trie.h"
 
-int command_type_to_number(char *command)
-{
-	if (!command)
-		return -1;
-
-	if (strcmp(command, "INSERT") == 0)
-		return 1;
-	if (strcmp(command, "LOAD") == 0)
-		return 2;
-	if (strcmp(command, "REMOVE") == 0)
-		return 3;
-	if (strcmp(command, "AUTOCORRECT") == 0)
-		return 4;
-	if (strcmp(command, "AUTOCOMPLETE") == 0)
-		return 5;
-	if (strcmp(command, "EXIT") == 0)
-		return 6;
-
-	return -1;
-}
-
 int main(void)
 {
 	char line[MAX_LINE];

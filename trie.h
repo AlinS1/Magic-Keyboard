@@ -4,7 +4,6 @@
 #define ALPHABET_SIZE 26
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
 
-/* useful macro for handling error codes */
 #define DIE(assertion, call_description)                       \
 	do {                                                       \
 		if (assertion) {                                       \
@@ -40,8 +39,8 @@ struct trie_t {
 	int alphabet_size;
 	char *alphabet;
 
-	/* Optional - number of nodes, useful to test correctness */
-	int nNodes;
+	/* Number of nodes */
+	int nr_nodes;
 };
 
 trie_node_t *trie_create_node(trie_t *trie);

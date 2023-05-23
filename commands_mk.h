@@ -9,10 +9,10 @@
 
 #define MAX_LINE 100
 
+int command_type_to_number(char *command);
 void insert_command(trie_t *trie, char *delim);
 void load_command(trie_t *trie, char *delim);
 void remove_command(trie_t *trie, char *delim);
-
 
 // AUTOCOMPLETE FUNCTIONS
 void autocomplete_smallest_lexico(trie_node_t *node, char *prefix);
@@ -34,10 +34,10 @@ void autocomplete_most_frequent(trie_node_t *node, char *prefix);
 void autocomplete_command(trie_t *trie, char *delim);
 
 // AUTOCORRECT FUNCTIONS
-
+int compare_words(char *initial_word, char *current_word, int nr_max_diff);
+void autocorrect_helper(trie_node_t *node, char *initial_word, int k,
+						int max_len, int *current_len, char *current_word,
+						int *found_words);
 void autocorrect_command(trie_t *trie, char *delim);
-
-
-
 
 #endif	// COMMANDS_MK_H

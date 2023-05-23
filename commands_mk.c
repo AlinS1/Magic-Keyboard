@@ -9,10 +9,30 @@
 
 #define INF 2147483647
 
+int command_type_to_number(char *command)
+{
+	if (!command)
+		return -1;
+
+	if (strcmp(command, "INSERT") == 0)
+		return 1;
+	if (strcmp(command, "LOAD") == 0)
+		return 2;
+	if (strcmp(command, "REMOVE") == 0)
+		return 3;
+	if (strcmp(command, "AUTOCORRECT") == 0)
+		return 4;
+	if (strcmp(command, "AUTOCOMPLETE") == 0)
+		return 5;
+	if (strcmp(command, "EXIT") == 0)
+		return 6;
+
+	return -1;
+}
+
 void insert_command(trie_t *trie, char *delim)
 {
 	char *word = strtok(NULL, delim);
-	// printf("word:%s\n", word);
 	trie_insert(trie, word);
 }
 
@@ -26,10 +46,8 @@ void load_command(trie_t *trie, char *delim)
 	char word[MAX_LINE];
 	while (!feof(in)) {
 		fscanf(in, "%s", word);
-		// printf("word:%s\n", word);
 		trie_insert(trie, word);
 	}
-	// printf("loaded file\n");
 	fclose(in);
 }
 
@@ -51,6 +69,8 @@ void autocomplete_smallest_lexico(trie_node_t *node, char *prefix)
 	int len = strlen(prefix);
 	nr_chars += len;
 	char *smallest_word = malloc(sizeof(char) * MAX_LINE);
+	DIE(!smallest_word, "malloc failed");
+
 	strcpy(smallest_word, prefix);
 
 	trie_node_t *current_node = node;
@@ -83,15 +103,12 @@ void autocomplete_shortest_helper(trie_node_t *node, char *aux_word,
 		if (*nr_chars < *shortest_len) {
 			*shortest_len = *nr_chars;
 			strcpy(shortest_word, aux_word);
-			// printf("shortest_ap:%d word:%s\n", *shortest_len,
-			//	   shortest_word);
 		}
 	}
 
 	// If it's a leaf node, it's surely an end of word
 	if (!node->children) {
 		*nr_chars = *nr_chars - 1;
-		// printf("word_found:%s\n", aux_word);
 		return;
 	}
 
@@ -121,6 +138,8 @@ void autocomplete_shortest(trie_node_t *node, char *prefix)
 	int len = strlen(prefix);
 	nr_chars += len;
 	char *aux_word = malloc(sizeof(char) * MAX_LINE);
+	DIE(!aux_word, "malloc failed");
+
 	strcpy(aux_word, prefix);
 
 	// Initialize the minimum length and its corresponding word.
@@ -151,15 +170,12 @@ void autocomplete_most_frequent_helper(trie_node_t *node, char *final_word,
 		if (node->appearances > *max_ap) {
 			*max_ap = node->appearances;
 			strcpy(max_ap_word, final_word);
-			// printf("max_ap:%d word:%s\n", *max_ap, max_ap_word);
 		}
-		// printf("word_found:%s\n", final_word);
 		return;
 	}
 
 	for (int i = 0; i < ALPHABET_SIZE; i++) {
 		if (node->children[i]) {
-			// printf("car:%c\n", i + 'a');
 			final_word[*nr_chars] = i + 'a';
 			*nr_chars = *nr_chars + 1;
 			final_word[*nr_chars] = '\0';
@@ -168,7 +184,6 @@ void autocomplete_most_frequent_helper(trie_node_t *node, char *final_word,
 				if (node->children[i]->appearances > *max_ap) {
 					*max_ap = node->children[i]->appearances;
 					strcpy(max_ap_word, final_word);
-					// printf("max_ap:%d word:%s\n", *max_ap, max_ap_word);
 				}
 			}
 			autocomplete_most_frequent_helper(node->children[i], final_word,
@@ -189,6 +204,8 @@ void autocomplete_most_frequent(trie_node_t *node, char *prefix)
 	int len = strlen(prefix);
 	nr_chars += len;
 	char *aux_word = malloc(sizeof(char) * MAX_LINE);
+	DIE(!aux_word, "malloc failed");
+
 	strcpy(aux_word, prefix);
 
 	// Initialize the maximum number of appearances and its corresponding word.
@@ -216,11 +233,15 @@ void autocomplete_command(trie_t *trie, char *delim)
 	char *prefix = strtok(NULL, delim);
 	char *number_crt_ascii = strtok(NULL, delim);
 	int number_crt = atoi(number_crt_ascii);
-	// printf("prefix:%s|; nr:%d|\n", prefix, number_crt);
 
 	trie_node_t *node_prefix = trie_search_path(trie, prefix);
+
 	if (!node_prefix) {
-		printf("No words found\n");
+		if (number_crt == 0)
+			for (int i = 0; i < 3; i++)
+				printf("No words found\n");
+		else
+			printf("No words found\n");
 		return;
 	}
 
@@ -258,29 +279,25 @@ int compare_words(char *initial_word, char *current_word, int nr_max_diff)
 	return 0;
 }
 
-// to be modified: current_len, current_word
-// when current_len == max_len && word.end  verificam
 void autocorrect_helper(trie_node_t *node, char *initial_word, int k,
 						int max_len, int *current_len, char *current_word,
-						int *words_found)
+						int *found_words)
 {
 	if (*current_len == max_len) {
 		if (node->end_of_word == 1) {
 			if (compare_words(initial_word, current_word, k) == 1) {
 				current_word[*current_len] = '\0';
-				*words_found = 1;
+				*found_words = 1;
 				printf("%s\n", current_word);
 			}
 		}
 		*current_len = *current_len - 1;
-		// current_word[*current_len] = '\0';
 
 		return;	 // go back if we reach the maximum length
 	}
 
 	if (!node->children) {
 		*current_len = *current_len - 1;
-		// current_word[*current_len] = '\0';
 
 		return;
 	}
@@ -289,13 +306,10 @@ void autocorrect_helper(trie_node_t *node, char *initial_word, int k,
 		if (node->children[i]) {
 			current_word[*current_len] = i + 'a';
 			*current_len = *current_len + 1;
-			// current_word[*current_len] = '\0';
 			autocorrect_helper(node->children[i], initial_word, k, max_len,
-							   current_len, current_word, words_found);
+							   current_len, current_word, found_words);
 		}
 	}
-
-	// current_word[*current_len] = '\0';
 	*current_len = *current_len - 1;
 }
 
@@ -308,6 +322,8 @@ void autocorrect_command(trie_t *trie, char *delim)
 
 	int current_len = 0;
 	char *current_word = malloc(sizeof(char) * (max_len + 1));
+	DIE(!current_word, "malloc failed");
+
 	current_word[0] = '\0';
 	int found_words = 0;
 	autocorrect_helper(trie->root, initial_word, k, max_len, &current_len,
