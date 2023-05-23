@@ -24,10 +24,12 @@ void load_command(trie_t *trie, char *delim)
 	DIE(!in, "cannot open file");
 
 	char word[MAX_LINE];
-	while (fscanf(in, "%s", word)) {
+	while (!feof(in)) {
+		fscanf(in, "%s", word);
+		//printf("word:%s\n", word);
 		trie_insert(trie, word);
 	}
-
+	//printf("loaded file\n");
 	fclose(in);
 }
 
@@ -233,11 +235,55 @@ void autocomplete_command(trie_t *trie, char *delim)
 	}
 }
 
+// Returns 1 if the words have a maximum of "nr_max_diff" different letters
+int compare_words(char *initial_word, char *current_word, int nr_max_diff)
+{
+	int len = strlen(initial_word);
+	int kon = 0;
+	for (int i = 0; i < len; i++) {
+		if (initial_word[i] != current_word[i])
+			kon++;
+	}
+	if (kon <= nr_max_diff)
+		return 1;
+	return 0;
+}
+
 // to be modified: current_len, current_word
+// when current_len == max_len && word.end  verificam
 void autocorrect_helper(trie_node_t *node, char *initial_word, int k,
 						int max_len, int *current_len, char *current_word)
 {
-	// asemanator cu celelalte
+	if (*current_len == max_len) {
+		if (node->end_of_word == 1) {
+			if (compare_words(initial_word, current_word, k) == 1)
+				printf("%s\n", current_word);
+		}
+		*current_len = *current_len - 1;
+		current_word[*current_len] = '\0';
+
+		return;	 // go back if we reach the maximum length
+	}
+
+	if (!node->children) {
+		*current_len = *current_len - 1;
+		current_word[*current_len] = '\0';
+
+		return;
+	}
+
+	for (int i = 0; i < ALPHABET_SIZE; i++) {
+		if (node->children[i]) {
+			current_word[*current_len] = i + 'a';
+			*current_len = *current_len + 1;
+			current_word[*current_len] = '\0';
+			autocorrect_helper(node->children[i], initial_word, k, max_len,
+							   current_len, current_word);
+		}
+	}
+
+	current_word[*current_len] = '\0';
+	*current_len = *current_len - 1;
 }
 
 void autocorrect_command(trie_t *trie, char *delim)
@@ -250,5 +296,7 @@ void autocorrect_command(trie_t *trie, char *delim)
 	int current_len = 0;
 	char *current_word = malloc(sizeof(char) * max_len);
 	current_word[0] = '\0';
-	autocorrect_helper(trie->root, initial_word, k, max_len, current_word);
+	autocorrect_helper(trie->root, initial_word, k, max_len, &current_len,
+					   current_word);
+	free(current_word);
 }
