@@ -48,12 +48,14 @@ int main(void)
 			remove_command(trie, delim);
 			break;
 		case 4:	 // AUTOCORRECT
+			autocorrect_command(trie, delim);
 			break;
 		case 5:	 // AUTOCOMPLETE
 			autocomplete_command(trie, delim);
 			break;
 		case 6:	 // EXIT
-
+			trie_free(trie->root);
+			free(trie);
 			exit(0);
 		}
 	}

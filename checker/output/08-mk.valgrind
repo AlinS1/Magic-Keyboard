@@ -1,0 +1,6 @@
+==18571== Memcheck, a memory error detector
+==18571== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==18571== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==18571== Command: ./mk
+==18571== Parent PID: 18525
+==18571== 

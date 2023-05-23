@@ -1,0 +1,6 @@
+==18575== Memcheck, a memory error detector
+==18575== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==18575== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==18575== Command: ./mk
+==18575== Parent PID: 18525
+==18575== 

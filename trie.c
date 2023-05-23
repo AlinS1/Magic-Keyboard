@@ -1,9 +1,9 @@
-#include "trie.h"	
+#include "trie.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
 trie_node_t *trie_create_node(trie_t *trie)
 {
@@ -68,7 +68,8 @@ void trie_insert(trie_t *trie, char *key)
 	current_node->appearances = 1;
 }
 
-trie_node_t *trie_search(trie_t *trie, char *key)
+// Verifies if there is a path with the letters given in key.
+trie_node_t *trie_search_path(trie_t *trie, char *key)
 {
 	if (!trie)
 		return NULL;
@@ -84,9 +85,31 @@ trie_node_t *trie_search(trie_t *trie, char *key)
 			return NULL;
 		current_node = current_node->children[idx];
 	}
+	return current_node;
+}
+
+// Verifies if there is a complete word with the letters given in key.
+trie_node_t *trie_search(trie_t *trie, char *key)
+{
+	if (!trie)
+		return NULL;
+	int len = strlen(key);
+	if (len == 0)
+		return trie->root;
+
+	trie_node_t *current_node = trie->root;
+	for (int i = 0; i < len; i++) {
+		int idx = key[i] - 'a';
+		if (current_node->children == NULL ||
+			current_node->children[idx] == NULL)
+			return NULL;
+		current_node = current_node->children[idx];
+	}
 	// pt ultimul
 	if (current_node->end_of_word == 1)
 		return current_node;
+	else
+		return NULL;
 }
 
 void aux_trie_remove(trie_t *trie, char *key)
@@ -142,7 +165,7 @@ void trie_remove(trie_t *trie, char *key)
 	// Verificam daca avem acel cuvant
 	trie_node_t *node = trie_search(trie, key);
 	if (!node) {
-		printf("No such word\n");
+		// printf("No such word\n");
 		return;
 	}
 
@@ -154,6 +177,7 @@ void trie_remove(trie_t *trie, char *key)
 	}
 
 	node->end_of_word = 0;
+	node->appearances = 0;
 	if (node->n_children == 0) {
 		char *new_word = malloc(sizeof(char) * len);
 		for (int i = 0; i < len - 1; i++)
