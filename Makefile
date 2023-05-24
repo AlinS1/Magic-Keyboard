@@ -8,9 +8,11 @@ TRIE=trie
 COMMANDS_MK=commands_mk
 MK=mk
 KNN=kNN
+KDTREE=kd_tree
+COMMANDS_KNN=commands_knn
 
 #define object-files
-OBJ=mk.o kNN.o commands_mk.o trie.o
+OBJ=mk.o commands_mk.o trie.o kNN.o kd_tree.o commands_knn.o
 
 build: $(TARGETS)
 
@@ -29,14 +31,20 @@ commands_mk.o: $(COMMANDS_MK).c $(COMMANDS_MK).h
 
 
 # TASK_2
-kNN: kNN.o
+kNN: kNN.o $(KDTREE).o $(COMMANDS_KNN).o
 	$(CC) $(CFLAGS) $^ -o $@
 
 kNN.o: kNN.c
 	$(CC) $(CFLAGS) $^ -c
 
+kd_tree.o: $(KDTREE).c $(KDTREE).h
+	$(CC) $(CFLAGS) $^ -c
+
+commands_knn.o: $(COMMANDS_KNN).c $(COMMANDS_KNN).h
+	$(CC) $(CFLAGS) $^ -c
 
 
+# OTHERS
 pack:
 	zip -FSr 314CA_SimileaAlin-Andrei_Tema3.zip README.md Makefile *.c *.h
 
