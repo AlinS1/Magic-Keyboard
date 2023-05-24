@@ -25,6 +25,8 @@ struct kdt_node_t {
 
 	/* data contained by the node */
 	int *data;
+
+	int level;
 };
 
 typedef struct kdt_tree_t kdt_tree_t;
@@ -49,6 +51,12 @@ void kdt_tree_insert(kdt_tree_t *kdt_tree, int *data);
 void __kdt_tree_free(kdt_node_t *kdt_node);
 
 void kdt_tree_free(kdt_tree_t *kdt_tree);
+
+void __kdt_tree_print_inorder(kdt_node_t *kdt_node,
+							  void (*print_data)(int *, int), int k);
+
+void kdt_tree_print_inorder(kdt_tree_t *kdt_tree,
+							void (*print_data)(int *, int));
 
 // ===============================
 // ===== Auxiliary Functions =====

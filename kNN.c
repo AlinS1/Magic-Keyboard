@@ -20,12 +20,16 @@ int main(void)
 
 		switch (command_type) {
 		case 1:	 // LOAD
+			kdt = load_command(delim);
 			break;
 		case 2:	 // NEAREST NEIGHBOUR
+			nearest_neighbour_command(kdt, delim);
 			break;
 		case 3:	 // RANGE SEARCH
 			break;
 		case 4:	 // EXIT
+			kdt_tree_free(kdt);
+			exit(0);
 			break;
 		default:
 			printf("Incorrect command\n");
