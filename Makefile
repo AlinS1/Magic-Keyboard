@@ -32,7 +32,7 @@ commands_mk.o: $(COMMANDS_MK).c $(COMMANDS_MK).h
 
 # TASK_2
 kNN: kNN.o $(KDTREE).o $(COMMANDS_KNN).o
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 kNN.o: kNN.c
 	$(CC) $(CFLAGS) $^ -c

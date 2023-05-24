@@ -1,9 +1,9 @@
+#include "kd_tree.h"
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "kd_tree.h"
 
 /**
  * Helper function to create a node
@@ -21,6 +21,8 @@ kdt_node_t *__kdt_node_create(int *data, int k)
 	kdt_node->data = malloc(k * sizeof(int));
 	DIE(!kdt_node->data, "kdt_node->data malloc");
 	memcpy(kdt_node->data, data, k * sizeof(int));
+
+	kdt_node->level = 0;
 
 	return kdt_node;
 }
@@ -52,36 +54,31 @@ void kdt_tree_insert(kdt_tree_t *kdt_tree, int *data)
 	kdt_node_t *root = kdt_tree->root;
 	kdt_node_t *parent = NULL;
 	kdt_node_t *node = __kdt_node_create(data, kdt_tree->k);
-	int current_dim = 0;
 
 	if (kdt_tree->root == NULL) {
 		kdt_tree->root = node;
-		printf("Inserted element:");
-		print_data(data, kdt_tree->k);
 		return;
 	}
 
 	while (root) {
-		rc = cmp_dim(root->data, data, current_dim, kdt_tree->k);
+		rc = cmp_dim(root->data, data, node->level, kdt_tree->k);
 		if (rc > 0) {
 			parent = root;
 			root = root->left;
-		} else if (rc < 0) {
+		} else {
 			parent = root;
 			root = root->right;
 		}
-		current_dim++;
+		node->level++;
 	}
+	node->level--;
 
-	rc = cmp_dim(parent->data, data, current_dim - 1, kdt_tree->k);
+	rc = cmp_dim(parent->data, data, node->level, kdt_tree->k);
 	if (rc > 0) {
 		parent->left = node;
 	} else {
 		parent->right = node;
 	}
-
-	printf("Inserted element:");
-	print_data(data, kdt_tree->k);
 }
 
 /**
@@ -114,12 +111,12 @@ void kdt_tree_free(kdt_tree_t *kdt_tree)
 	free(kdt_tree);
 }
 
-int cmp_dim(int *current, int *to_add, int current_dim, int k)
+int cmp_dim(int *root, int *to_add, int current_level, int k)
 {
-	int idx = current_dim % k;	// prima dimensiune -> 0
-	if (current[idx] <= to_add[idx])
-		return -1;	// dreapta
-	return 1;		// stanga
+	int idx = current_level % k;  // prima dimensiune -> 0
+	if (root[idx] > to_add[idx])
+		return 1;  // stanga
+	return -1;	   // dreapta
 }
 
 void print_data(int *data, int k)
@@ -129,27 +126,27 @@ void print_data(int *data, int k)
 	printf("\n");
 }
 
-// static void __kdt_tree_print_inorder(kdt_node_t *kdt_node,
-// 									 void (*print_data)(int *, int), int k)
-// {
-// 	if (!kdt_node)
-// 		return;
+void __kdt_tree_print_inorder(kdt_node_t *kdt_node,
+							  void (*print_data_f)(int *, int), int k)
+{
+	if (!kdt_node)
+		return;
 
-// 	__kdt_tree_print_inorder(kdt_node->left, print_data, k);
-// 	print_data(kdt_node->data, k);
-// 	__kdt_tree_print_inorder(kdt_node->right, print_data, k);
-// }
+	__kdt_tree_print_inorder(kdt_node->left, print_data_f, k);
+	print_data_f(kdt_node->data, k);
+	__kdt_tree_print_inorder(kdt_node->right, print_data_f, k);
+}
 
-// /**
-//  * Print inorder a kdt
-//  * @kdt_tree: the kdt to be printed
-//  * @print_data: function used to print the data contained by a node
-//  */
-// void kdt_tree_print_inorder(kdt_tree_t *kdt_tree,
-// 							void (*print_data)(int *, int))
-// {
-// 	__kdt_tree_print_inorder(kdt_tree->root, print_data, kdt_tree->k);
-// }
+/**
+ * Print inorder a kdt
+ * @kdt_tree: the kdt to be printed
+ * @print_data: function used to print the data contained by a node
+ */
+void kdt_tree_print_inorder(kdt_tree_t *kdt_tree,
+							void (*print_data_f)(int *, int))
+{
+	__kdt_tree_print_inorder(kdt_tree->root, print_data_f, kdt_tree->k);
+}
 
 // int main(void)
 // {
@@ -160,7 +157,7 @@ void print_data(int *data, int k)
 
 // 	for (int i = 0; i < n; i++) {
 // 		int *element = malloc(k * sizeof(int));
-// 		for (int i = 0; i < k; i++) {
+// 		for (int j = 0; j < k; j++) {
 // 			scanf("%d", &element[i]);
 // 		}
 // 		kdt_tree_insert(kdt, element);
