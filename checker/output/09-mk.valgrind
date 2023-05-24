@@ -4,3 +4,12 @@
 ==4933== Command: ./mk
 ==4933== Parent PID: 3526
 ==4933== 
+==4933== 
+==4933== HEAP SUMMARY:
+==4933==     in use at exit: 0 bytes in 0 blocks
+==4933==   total heap usage: 165,288 allocs, 165,288 frees, 16,812,463 bytes allocated
+==4933== 
+==4933== All heap blocks were freed -- no leaks are possible
+==4933== 
+==4933== For lists of detected and suppressed errors, rerun with: -s
+==4933== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
