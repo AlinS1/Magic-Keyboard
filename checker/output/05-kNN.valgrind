@@ -1,0 +1,15 @@
+==4939== Memcheck, a memory error detector
+==4939== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==4939== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==4939== Command: ./kNN
+==4939== Parent PID: 3526
+==4939== 
+==4939== 
+==4939== HEAP SUMMARY:
+==4939==     in use at exit: 0 bytes in 0 blocks
+==4939==   total heap usage: 2,721 allocs, 2,721 frees, 40,568 bytes allocated
+==4939== 
+==4939== All heap blocks were freed -- no leaks are possible
+==4939== 
+==4939== For lists of detected and suppressed errors, rerun with: -s
+==4939== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

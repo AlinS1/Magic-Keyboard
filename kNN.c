@@ -26,6 +26,7 @@ int main(void)
 			nearest_neighbour_command(kdt, delim);
 			break;
 		case 3:	 // RANGE SEARCH
+			range_search_command(kdt, delim);
 			break;
 		case 4:	 // EXIT
 			kdt_tree_free(kdt);

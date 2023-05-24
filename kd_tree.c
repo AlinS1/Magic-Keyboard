@@ -16,7 +16,8 @@ kdt_node_t *__kdt_node_create(int *data, int k)
 
 	DIE(!kdt_node, "kdt_node malloc");
 
-	kdt_node->left = kdt_node->right = NULL;
+	kdt_node->left = NULL;
+	kdt_node->right = NULL;
 
 	kdt_node->data = malloc(k * sizeof(int));
 	DIE(!kdt_node->data, "kdt_node->data malloc");
@@ -55,7 +56,7 @@ void kdt_tree_insert(kdt_tree_t *kdt_tree, int *data)
 	kdt_node_t *parent = NULL;
 	kdt_node_t *node = __kdt_node_create(data, kdt_tree->k);
 
-	if (kdt_tree->root == NULL) {
+	if (!kdt_tree->root) {
 		kdt_tree->root = node;
 		return;
 	}
@@ -74,11 +75,10 @@ void kdt_tree_insert(kdt_tree_t *kdt_tree, int *data)
 	node->level--;
 
 	rc = cmp_dim(parent->data, data, node->level, kdt_tree->k);
-	if (rc > 0) {
+	if (rc > 0)
 		parent->left = node;
-	} else {
+	else
 		parent->right = node;
-	}
 }
 
 /**
@@ -125,53 +125,3 @@ void print_data(int *data, int k)
 		printf("%d ", data[i]);
 	printf("\n");
 }
-
-void __kdt_tree_print_inorder(kdt_node_t *kdt_node,
-							  void (*print_data_f)(int *, int), int k)
-{
-	if (!kdt_node)
-		return;
-
-	__kdt_tree_print_inorder(kdt_node->left, print_data_f, k);
-	print_data_f(kdt_node->data, k);
-	__kdt_tree_print_inorder(kdt_node->right, print_data_f, k);
-}
-
-/**
- * Print inorder a kdt
- * @kdt_tree: the kdt to be printed
- * @print_data: function used to print the data contained by a node
- */
-void kdt_tree_print_inorder(kdt_tree_t *kdt_tree,
-							void (*print_data_f)(int *, int))
-{
-	__kdt_tree_print_inorder(kdt_tree->root, print_data_f, kdt_tree->k);
-}
-
-// int main(void)
-// {
-// 	int n, k;
-// 	printf("Enter n and k(nr_dim):");
-// 	scanf("%d %d", &n, &k);
-// 	kdt_tree_t *kdt = kdt_tree_create(k);
-
-// 	for (int i = 0; i < n; i++) {
-// 		int *element = malloc(k * sizeof(int));
-// 		for (int j = 0; j < k; j++) {
-// 			scanf("%d", &element[i]);
-// 		}
-// 		kdt_tree_insert(kdt, element);
-// 		free(element);
-// 	}
-// 	printf("Root:\n");
-// 	print_data(kdt->root->data, k);
-// 	printf("L_son:\n");
-// 	print_data(kdt->root->left->data, k);
-// 	printf("R_son:\n");
-// 	print_data(kdt->root->right->data, k);
-// 	printf("Inordine:\n");
-// 	kdt_tree_print_inorder(kdt, print_data);
-// 	kdt_tree_free(kdt);
-
-// 	return 0;
-// }

@@ -1,0 +1,6 @@
+==4943== Memcheck, a memory error detector
+==4943== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==4943== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==4943== Command: ./kNN
+==4943== Parent PID: 3526
+==4943== 
